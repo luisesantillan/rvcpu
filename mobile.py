@@ -10,7 +10,7 @@ args = parser.parse_args()
 
 weight_root = os.environ.get('weight_root', '')
 index_root = os.environ.get('index_root', '')
-model_files = [f for f in os.listdir(weight_root) if f.endswith('.pth')] if os.path.exists(weight_root) and os.listdir(weight_root) else None
+model_files = [f for f in os.listdir(weight_root) if f.endswith('.pth')] if os.path.exists(weight_root) and os.listdir(weight_root) else []
 index_files = []
 for root, dirs, files in os.walk(index_root):
     for file in files:
