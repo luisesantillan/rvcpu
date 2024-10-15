@@ -27,15 +27,13 @@ class VoiceClone:
     def offload(self):
         self.voice = None
         
-    def convert(self, input_path, **kwargs):
-        f0up_key = kwargs.get('f0up_key', self.f0up_key)
-        f0method = kwargs.get('f0method', self.f0method)
+    def convert(self, input_path):
         _, wav_opt = self.vc.vc_single(
             0,
             input_path,
-            f0up_key,
+            self.f0up_key,
             None,
-            f0method,
+            self.f0method,
             self.index,
             None,
             self.index_rate,
@@ -46,13 +44,12 @@ class VoiceClone:
         )
         return wav_opt
 
-    def split_audio(audio_path, output_folder):
+    def split_audio(self, audio_path, output_folder, chunk_size_ms):
         if os.path.exists(output_folder):
             shutil.rmtree(output_folder)
-            os.makedirs(output_folder,exist_ok=True)
+        os.makedirs(output_folder,exist_ok=True)
         audio = AudioSegment.from_file(audio_path)
         duration_ms = len(audio)
-        chunk_size_ms = 10000  # 10 second chunks
         chunks = []
         for i in range(0, duration_ms, chunk_size_ms):
             chunk = audio[i:i + chunk_size_ms]
@@ -63,11 +60,11 @@ class VoiceClone:
         print("\n")
         return chunks
 
-    def convert_chunks(input_audio, pitch=0):
-        chunks = self.split_audio(input_audio, self.split_folder)
+    def convert_chunks(self, input_audio,chunk_size=10):
+        chunks = self.split_audio(input_audio, self.split_folder, chunk_size_ms=chunk_size * 1000)
         full_data = []
         for chunk in chunks:
-            rate, data = self.convert(chunk, f0up_key=pitch)
+            rate, data = self.convert(chunk)
             full_data.append(data)
             print(".",end="",flush=True)
         print("\n")
