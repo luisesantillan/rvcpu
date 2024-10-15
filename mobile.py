@@ -22,10 +22,13 @@ def initialize_vc(model, index):
 
 # Find the .index under the folder that shares a name with the selected .pth model
 def find_matching_index(model_path):
-    model_name = os.path.splitext(os.path.basename(model_path))[0]
-    for index_file in index_files:
-        if model_name in index_file:
-            return index_file
+    try:
+        model_name = os.path.splitext(os.path.basename(model_path))[0]
+        for index_file in index_files:
+            if model_name in index_file:
+                return index_file
+    except:
+        pass
 
 def convert_audio(audio_path, use_chunks, chunk_size, f0up_key, f0method, index_rate, protect):
     vc.f0up_key = f0up_key
