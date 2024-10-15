@@ -64,7 +64,7 @@ with gr.Blocks(title="🔊",theme=gr.themes.Base(primary_hue="rose",neutral_hue=
         gr.HTML("<a href='https://ko-fi.com/rejekts' target='_blank'>🤝 Donate </a>")
     with gr.Row():
         with gr.Column():
-            model_dropdown = gr.Dropdown(choices=model_files, label="Select Model", value=model_files[0] if model_files else None)
+            model_dropdown = gr.Dropdown(choices=model_files, label="Select Model", value=model_files[0] if len(model_files) > 0 else None)
             try: initialize_vc(model_files[0], find_matching_index(model_files[0])) 
             except: pass
             index_dropdown = gr.Dropdown(choices=index_files, label="Select Index", value=find_matching_index(model_files[0] if model_files else None))
