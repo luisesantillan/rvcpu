@@ -7,7 +7,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--share', action='store_true', help='Share the Gradio app', default=False)
 args = parser.parse_args()
-
+vc = None
 weight_root = os.environ.get('weight_root', '')
 index_root = os.environ.get('index_root', '')
 model_files = [f for f in os.listdir(weight_root) if f.endswith('.pth')] if os.path.exists(weight_root) and os.listdir(weight_root) else []
@@ -21,6 +21,7 @@ def initialize_vc(model, index):
     global vc
     if model in model_files:
         vc = VoiceClone(model, os.path.basename(index))
+        print(f"Model Loaded: {model}")
     else:
         gr.Warning(f"Invalid model selection: {model}. Please choose a valid model.")
         return None
@@ -77,8 +78,10 @@ with gr.Blocks(title="🔊",theme=gr.themes.Base(primary_hue="rose",neutral_hue=
     with gr.Row():
         with gr.Column():
             model_dropdown = gr.Dropdown(choices=model_files, label="Select Model", value=model_files[0] if len(model_files) > 0 else None)
-            try: initialize_vc(model_files[0], find_matching_index(model_files[0])) 
-            except: pass
+            try: 
+                initialize_vc(model_files[0], find_matching_index(model_files[0]))
+            except: 
+                pass
             index_dropdown = gr.Dropdown(choices=index_files, label="Select Index", value=find_matching_index(model_files[0] if len(model_files) > 0 else None))
             audio_input = gr.Audio(label="Input Audio", type="filepath")
             with gr.Accordion("Settings",open=False):
@@ -107,16 +110,17 @@ with gr.Blocks(title="🔊",theme=gr.themes.Base(primary_hue="rose",neutral_hue=
         outputs=[stereo_output]
     )
 
-    model_dropdown.change(
-        initialize_vc,
-        inputs=[model_dropdown, index_dropdown],
-    )
     # Update the value of the index when the model changes
     model_dropdown.change(
         lambda model: find_matching_index(model) if model else None,
         inputs=[model_dropdown],
         outputs=[index_dropdown]
     )
+    model_dropdown.change(
+        initialize_vc,
+        inputs=[model_dropdown, index_dropdown],
+    )
+    # Update the value of the index when the index changes
     index_dropdown.change(
         initialize_vc,
         inputs=[model_dropdown, index_dropdown],
