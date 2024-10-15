@@ -38,14 +38,16 @@ def find_matching_index(model_path):
         pass
 
 def convert_audio(audio_path, use_chunks, chunk_size, f0up_key, f0method, index_rate, protect, model_dropdown, index_dropdown):
+    print(audio_path, use_chunks, chunk_size, f0up_key, f0method, index_rate, protect, model_dropdown, index_dropdown)
     global vc
     if vc == None:
         try:
-            initialize_vc(model_dropdown, index_dropdown)
+            model_name, index_name = model_dropdown, index_dropdown
+            initialize_vc(model_name, index_name)
             print("Model initialized.")
         except:
             gr.Warning("Please select a model and index file.")
-        return None
+            return None
     vc.f0up_key = f0up_key
     vc.f0method = f0method
     vc.index_rate = index_rate
