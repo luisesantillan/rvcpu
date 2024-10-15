@@ -18,8 +18,11 @@ for root, dirs, files in os.walk(index_root):
             index_files.append(os.path.join(root, file))
 
 def initialize_vc(model, index):
-    global vc
-    vc = VoiceClone(model, os.path.basename(index))
+    try:
+        global vc
+        vc = VoiceClone(model, os.path.basename(index))
+    except Exception as e:
+        print(f"Error initializing VC: {e}")
 
 # Find the .index under the folder that shares a name with the selected .pth model
 def find_matching_index(model_path):
