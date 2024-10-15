@@ -18,7 +18,12 @@ for root, dirs, files in os.walk(index_root):
             index_files.append(os.path.join(root, file))
 
 def initialize_vc(model, index):
-    vc = VoiceClone(model, os.path.basename(index))
+    global vc
+    if model in model_files:
+        vc = VoiceClone(model, os.path.basename(index))
+    else:
+        gr.Warning(f"Invalid model selection: {model}. Please choose a valid model.")
+        return None
 
 # Find the .index under the folder that shares a name with the selected .pth model
 def find_matching_index(model_path):
@@ -94,12 +99,12 @@ with gr.Blocks(title="🔊",theme=gr.themes.Base(primary_hue="rose",neutral_hue=
     convert_btn.click(
         convert_audio,
         inputs=[audio_input, use_chunks, chunk_size, f0up_key, f0method, index_rate, protect],
-        outputs=audio_output
+        outputs=[audio_output]
     )
     audio_output.change(
         stereo,
         inputs=[audio_output],
-        outputs=stereo_output
+        outputs=[stereo_output]
     )
 
     model_dropdown.change(
