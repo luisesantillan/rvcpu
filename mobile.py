@@ -23,6 +23,7 @@ def initialize_vc(model, index):
     if model in model_files:
         vc = VoiceClone(model, os.path.basename(index))
         print(f"Model Loaded: {model}")
+        return True
     else:
         gr.Warning(f"Invalid model selection: {model}. Please choose a valid model.")
         return None
@@ -45,8 +46,9 @@ def convert_audio(audio_path, use_chunks, chunk_size, f0up_key, f0method, index_
             model_name, index_name = model_dropdown, index_dropdown
             initialize_vc(model_name, index_name)
             print("Model initialized.")
-        except:
+        except Exception as e:
             gr.Warning("Please select a model and index file.")
+            print(e)
             return None
     vc.f0up_key = f0up_key
     vc.f0method = f0method
