@@ -18,8 +18,11 @@ for root, dirs, files in os.walk(index_root):
             index_files.append(os.path.join(root, file))
 
 def initialize_vc(model, index):
+    global vc
+    # Avoid NoneType errors
+    if model is None or index is None:
+        return
     try:
-        global vc
         vc = VoiceClone(model, os.path.basename(index))
     except Exception as e:
         print(f"Error initializing VC: {e}")
