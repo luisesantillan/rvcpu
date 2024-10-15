@@ -4,6 +4,7 @@ import numpy as np
 from pydub import AudioSegment
 from rvcpu import VoiceClone
 import argparse
+import shutil
 parser = argparse.ArgumentParser()
 parser.add_argument('--share', action='store_true', help='Share the Gradio app', default=False)
 args = parser.parse_args()
@@ -49,10 +50,12 @@ def convert_audio(audio_path, use_chunks, chunk_size, f0up_key, f0method, index_
     vc.f0method = f0method
     vc.index_rate = index_rate
     vc.protect = protect
+    audio_name = "last_recording.wav"
+    shutil.copy(audio_path, os.path.join("audios", audio_name))
     if use_chunks:
-        rate, data = vc.convert_chunks(audio_path.path, chunk_size=chunk_size)
+        rate, data = vc.convert_chunks(os.path.join("audios", audio_name), chunk_size=chunk_size)
     else:
-        rate, data = vc.convert(audio_path.path)
+        rate, data = vc.convert(os.path.join("audios", audio_name))
     return (rate, np.array(data))
 
 def stereo(audio_path, delay_ms=0.6):
