@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from configs.config import Config
 from infer.modules.vc.modules import VC
 from pydub import AudioSegment
+from tqdm import tqdm
 load_dotenv()
 
 class VoiceClone:
@@ -56,17 +57,19 @@ class VoiceClone:
             chunk_name = f"{output_folder}/{os.path.basename(audio_path).split('.')[0]}_{i // 1000 + 1}.mp3"
             chunk.export(chunk_name, format="mp3")
             chunks.append(chunk_name)
-            print("/",end="",flush=True)
         print("\n")
         return chunks
 
     def convert_chunks(self, input_audio,chunk_size=10):
         chunks = self.split_audio(input_audio, self.split_folder, chunk_size_ms=chunk_size * 1000)
         full_data = []
-        for chunk in chunks:
-            rate, data = self.convert(chunk)
-            full_data.append(data)
-            print(".",end="",flush=True)
+
+        with tqdm(total=len(chunks), desc="Converting chunks", unit="chunk") as pbar:
+            for chunk in chunks:
+                rate, data = self.convert(chunk)
+                full_data.append(data)
+                pbar.update(1)
+
         print("\n")
         full_data = [item for sublist in full_data for item in sublist]
         return rate, full_data
