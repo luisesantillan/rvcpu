@@ -10,7 +10,7 @@ args = parser.parse_args()
 
 weight_root = os.environ.get('weight_root', '')
 index_root = os.environ.get('index_root', '')
-model_files = [f for f in os.listdir(weight_root) if f.endswith('.pth')] if os.path.exists(weight_root) and os.listdir(weight_root) else None
+model_files = [f for f in os.listdir(weight_root) if f.endswith('.pth')] if os.path.exists(weight_root) and os.listdir(weight_root) else []
 index_files = []
 for root, dirs, files in os.walk(index_root):
     for file in files:
@@ -18,20 +18,20 @@ for root, dirs, files in os.walk(index_root):
             index_files.append(os.path.join(root, file))
 
 def initialize_vc(model, index):
-    try:
-        global vc
-        vc = VoiceClone(model, os.path.basename(index))
-    except Exception as e:
-        print(f"Error initializing VC: {e}")
+    vc = VoiceClone(model, os.path.basename(index))
 
 # Find the .index under the folder that shares a name with the selected .pth model
 def find_matching_index(model_path):
-    model_name = os.path.splitext(os.path.basename(model_path))[0]
-    for index_file in index_files:
-        if model_name in index_file:
-            return index_file
+    try:
+        model_name = os.path.splitext(os.path.basename(model_path))[0]
+        for index_file in index_files:
+            if model_name in index_file:
+                return index_file
+    except:
+        pass
 
 def convert_audio(audio_path, use_chunks, chunk_size, f0up_key, f0method, index_rate, protect):
+    global vc
     vc.f0up_key = f0up_key
     vc.f0method = f0method
     vc.index_rate = index_rate
@@ -68,9 +68,10 @@ with gr.Blocks(title="🔊",theme=gr.themes.Base(primary_hue="rose",neutral_hue=
         gr.HTML("<a href='https://ko-fi.com/rejekts' target='_blank'>🤝 Donate </a>")
     with gr.Row():
         with gr.Column():
-            model_dropdown = gr.Dropdown(choices=model_files, label="Select Model", value=model_files[0] if model_files else None)
-            initialize_vc(model_files[0], find_matching_index(model_files[0]))
-            index_dropdown = gr.Dropdown(choices=index_files, label="Select Index", value=find_matching_index(model_files[0] if model_files else None))
+            model_dropdown = gr.Dropdown(choices=model_files, label="Select Model", value=model_files[0] if len(model_files) > 0 else None)
+            try: initialize_vc(model_files[0], find_matching_index(model_files[0])) 
+            except: pass
+            index_dropdown = gr.Dropdown(choices=index_files, label="Select Index", value=find_matching_index(model_files[0] if len(model_files) > 0 else None))
             audio_input = gr.Audio(label="Input Audio", type="filepath")
             with gr.Accordion("Settings",open=False):
                 use_chunks = gr.Checkbox(label="Use Chunks", value=True)
