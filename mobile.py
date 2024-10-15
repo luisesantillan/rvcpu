@@ -36,10 +36,14 @@ def find_matching_index(model_path):
     except:
         pass
 
-def convert_audio(audio_path, use_chunks, chunk_size, f0up_key, f0method, index_rate, protect):
+def convert_audio(audio_path, use_chunks, chunk_size, f0up_key, f0method, index_rate, protect, model_dropdown, index_dropdown):
     global vc
     if vc == None:
-        gr.Warning("Please select a model and index file.")
+        try:
+            initialize_vc(model_dropdown, index_dropdown)
+            print("Model initialized.")
+        except:
+            gr.Warning("Please select a model and index file.")
         return None
     vc.f0up_key = f0up_key
     vc.f0method = f0method
@@ -94,14 +98,10 @@ with gr.Blocks(title="🔊",theme=gr.themes.Base(primary_hue="rose",neutral_hue=
             convert_btn = gr.Button("Convert")
             audio_output = gr.Audio(label="Converted Audio",interactive=False)
             stereo_output = gr.Audio(label="Stereo Effect",interactive=False)
-
-    convert_btn.click(# if the model is not yet loaded into vc, load it up
-        lambda model,index: initialize_vc(model, index) if model else None,
-        inputs=[model_dropdown, index_dropdown]
-    )
+    # Convert audio when the button is clicked
     convert_btn.click(
         convert_audio,
-        inputs=[audio_input, use_chunks, chunk_size, f0up_key, f0method, index_rate, protect],
+        inputs=[audio_input, use_chunks, chunk_size, f0up_key, f0method, index_rate, protect, model_dropdown, index_dropdown],
         outputs=[audio_output]
     )
     audio_output.change(
