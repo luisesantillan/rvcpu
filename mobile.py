@@ -50,9 +50,9 @@ def convert_audio(audio_path, use_chunks, chunk_size, f0up_key, f0method, index_
     vc.index_rate = index_rate
     vc.protect = protect
     if use_chunks:
-        rate, data = vc.convert_chunks(audio_path, chunk_size=chunk_size)
+        rate, data = vc.convert_chunks(audio_path.path, chunk_size=chunk_size)
     else:
-        rate, data = vc.convert(audio_path)
+        rate, data = vc.convert(audio_path.path)
     return (rate, np.array(data))
 
 def stereo(audio_path, delay_ms=0.6):
