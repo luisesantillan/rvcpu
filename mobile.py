@@ -31,6 +31,7 @@ def find_matching_index(model_path):
         pass
 
 def convert_audio(audio_path, use_chunks, chunk_size, f0up_key, f0method, index_rate, protect):
+    global vc
     vc.f0up_key = f0up_key
     vc.f0method = f0method
     vc.index_rate = index_rate
