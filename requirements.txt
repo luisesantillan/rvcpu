@@ -7,3 +7,4 @@ pyworld==0.3.2
 fairseq==0.12.2
 numpy==1.23.5
 av
+pydub
