@@ -18,14 +18,7 @@ for root, dirs, files in os.walk(index_root):
             index_files.append(os.path.join(root, file))
 
 def initialize_vc(model, index):
-    global vc
-    # Avoid NoneType errors
-    if model is None or index is None:
-        return
-    try:
-        vc = VoiceClone(model, os.path.basename(index))
-    except Exception as e:
-        print(f"Error initializing VC: {e}")
+    vc = VoiceClone(model, os.path.basename(index))
 
 # Find the .index under the folder that shares a name with the selected .pth model
 def find_matching_index(model_path):
@@ -72,7 +65,8 @@ with gr.Blocks(title="🔊",theme=gr.themes.Base(primary_hue="rose",neutral_hue=
     with gr.Row():
         with gr.Column():
             model_dropdown = gr.Dropdown(choices=model_files, label="Select Model", value=model_files[0] if model_files else None)
-            initialize_vc(model_files[0], find_matching_index(model_files[0]))
+            try: initialize_vc(model_files[0], find_matching_index(model_files[0])) 
+            except: pass
             index_dropdown = gr.Dropdown(choices=index_files, label="Select Index", value=find_matching_index(model_files[0] if model_files else None))
             audio_input = gr.Audio(label="Input Audio", type="filepath")
             with gr.Accordion("Settings",open=False):
